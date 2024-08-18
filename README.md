@@ -2,9 +2,11 @@ HEY! Welcome to Easy SSH. This is a simple Python-based SSH server that you can 
 
 GETTING STARTED
 
-1. Generate an RSA Key
+1. Install dependencies
 
-run this:
+``` pip install -r requirements.txt ```
+
+1. Generate a RSA Key
 
 ``` ssh-keygen -t rsa -b 2048 -f test_rsa.key ```
 
