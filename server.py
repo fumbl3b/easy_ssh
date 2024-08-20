@@ -19,6 +19,12 @@ class SimpleSSHServer(paramiko.ServerInterface):
         if username == 'user' and password == 'password':
             return paramiko.AUTH_SUCCESSFUL
         return paramiko.AUTH_FAILED
+    
+    def check_channel_pty_request(self, channel, term, width, height, pixelwidth, pixelheight, modes):
+        return True
+    
+    def check_channel_shell_request(self, channel):
+        return True
 
 def handle_client(client_socket):
     transport = paramiko.Transport(client_socket)
