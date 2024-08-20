@@ -34,13 +34,13 @@ def handle_client(client_socket):
 
     channel = transport.accept()
     if channel is not None:
-        channel.send("Welcome to the SSH Server")
+        channel.send("Welcome to the SSH Server\r\n")
         while True:
             command = channel.recv(1024).decode('utf-8')
             if command.strip() == "exit":
                 break
             else:
-                channel.send(f"Command received: {command}\n")
+                channel.send(f"Command received: {command}\r\n")
 
         channel.close()
 
