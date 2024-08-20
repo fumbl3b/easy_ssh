@@ -10,6 +10,13 @@ passphrase = getpass.getpass("Enter passphrase for the key:")
 HOST_KEY = paramiko.RSAKey(filename='test_rsa.key', password=passphrase)
 
 class SimpleSSHServer(paramiko.ServerInterface):
+    
+    pty_width: int
+    pty_height: int
+    
+    def __init__(self):
+        self.event = threading.Event()
+
     def check_channel_request(self, kind, chanid):
         if kind == 'session':
             return paramiko.OPEN_SUCCEEDED
@@ -19,6 +26,14 @@ class SimpleSSHServer(paramiko.ServerInterface):
         if username == 'user' and password == 'password':
             return paramiko.AUTH_SUCCESSFUL
         return paramiko.AUTH_FAILED
+    
+    def check_channel_pty_request(self, channel, term, width, height, pixelwidth, pixelheight, modes):
+        self.pty_width = width
+        self.pty_height = height
+        return True
+    
+    def check_channel_shell_request(self, channel):
+        return True
 
 def handle_client(client_socket):
     transport = paramiko.Transport(client_socket)
@@ -28,13 +43,13 @@ def handle_client(client_socket):
 
     channel = transport.accept()
     if channel is not None:
-        channel.send("Welcome to the SSH Server")
+        channel.send("Welcome to the SSH Server\r\n--> ")
         while True:
             command = channel.recv(1024).decode('utf-8')
-            if command.strip() == "exit":
+            if command.strip() == "\x03": #ctrl-c
                 break
             else:
-                channel.send(f"Command received: {command}\n")
+                channel.send(f"{command}")
 
         channel.close()
 
